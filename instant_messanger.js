@@ -19,6 +19,9 @@ if (Meteor.isClient) {
 
       // Prevent default form submit
       return false;
+    },
+    "click #clear-history": function (event, template) {
+      Meteor.call("clearHistory");
     }
   });
 }
@@ -28,3 +31,9 @@ if (Meteor.isServer) {
     // code to run on server at startup
   });
 }
+
+Meteor.methods({
+  clearHistory: function() {
+    Msgs.remove({});
+  }
+});
