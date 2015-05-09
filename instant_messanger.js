@@ -11,10 +11,7 @@ if (Meteor.isClient) {
     "submit #msg-entry": function(event) {
       var msg = event.target.text.value;
 
-      Msgs.insert({
-        msg: msg,
-        createdAt: new Date()
-      });
+      Meteor.call("addMsg", msg);
       event.target.text.value = "";
 
       // Prevent default form submit
@@ -24,7 +21,13 @@ if (Meteor.isClient) {
       Meteor.call("clearHistory");
     }
   });
+
+  Accounts.ui.config({
+    passwordSignupFields: "USERNAME_ONLY"
+  });
 }
+
+// --------------------------------------------------------------------------
 
 if (Meteor.isServer) {
   Meteor.startup(function () {
@@ -35,5 +38,16 @@ if (Meteor.isServer) {
 Meteor.methods({
   clearHistory: function() {
     Msgs.remove({});
+  },
+  addMsg: function(msg) {
+    var date = new Date();
+
+    Msgs.insert({
+      msg: msg,
+      senderId: Meteor.userId(),
+      senderUsername: Meteor.user().username,
+      timestamp: moment(date).format('l LT'), //Using moment.js package to format dates.
+      createdAt: new Date()
+    });
   }
 });

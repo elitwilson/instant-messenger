@@ -14,21 +14,21 @@
 			<br />
 			<button class="btn btn-default" id="clear-history" name="clear-history" text="clear">Clear History</button>
 		</div>
-		<div class="col-md-4"></div>
-	</div>
-	<div class="row">
-		<div class="col-md-2"></div>
-		<div class="col-md-6">
-			{{>conversation}}
+		<div class="col-md-4">{{> loginButtons }}</div>
 		</div>
-	</div>
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-6">
+				{{>conversation}}
+			</div>
+		</div>
   </div>
 </body>
 
 <template name="conversation">
 	{{#each msgs}}
 		<ul>
-			<li>{{ msg }}</li>
+			<li><strong>{{ senderUsername }}</strong> ({{ timestamp }}): {{ msg }}</li>
 		</ul>
 	{{/each}}
 </template>
