@@ -1,0 +1,32 @@
+<head>
+  <title>instant_messanger</title>
+</head>
+
+<body>
+  <div class="container">	
+  	<h1 class="text-center">Instant Messenger</h1>
+  	<div class="row">
+	  	<div class="col-md-4"></div>
+		<div class="col-md-4">
+			<form id="msg-entry">
+				<input type="text" name="text" class="form-control" id="msg-entry" placeholder="Type message here...">
+			</form>
+		</div>
+		<div class="col-md-4"></div>
+	</div>
+	<div class="row">
+		<div class="col-md-2"></div>
+		<div class="col-md-6">
+			{{>conversation}}
+		</div>
+	</div>
+  </div>
+</body>
+
+<template name="conversation">
+	{{#each msgs}}
+		<ul>
+			<li>{{ msg }}</li>
+		</ul>
+	{{/each}}
+</template>
