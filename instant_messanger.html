@@ -4,17 +4,26 @@
 
 <body>
   <div class="container">	
-  	<h1 class="text-center">Instant Messenger</h1>
+  	<h1 class="text-center">Instant Messenger</h1><div class="pull-right">{{> loginButtons }}</div>
   	<div class="row">
-	  	<div class="col-md-4"></div>
-		<div class="col-md-4">
-			<form id="msg-entry">
-				<input type="text" name="text" class="form-control" id="msg-entry" placeholder="Type message here..." autocomplete="off" />
-			</form>
-			<br />
-			<button class="btn btn-default" id="clear-history" name="clear-history" text="clear">Clear History</button>
-		</div>
-		<div class="col-md-4">{{> loginButtons }}</div>
+  		<div class="col-md-4"></div>
+			<div class="col-md-4">
+				{{# if currentUser }}
+					<form id="msg-entry">
+						<input type="text" name="text" class="form-control" id="msg-entry" placeholder="Type message here..." autocomplete="off" />
+					</form>
+					<p></p>
+					<button class="btn btn-default" id="clear-history" name="clear-history" text="clear">Clear 
+					History</button>
+					<p></p>
+				{{ else }}
+					<h3>Must sign in or create account</h3>
+				{{/if}}
+			</div>
+			<div class="col-md-3" id="friends-container">
+				<h3>Friends</h3>
+				{{>friendsList}}
+			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-2"></div>
@@ -23,6 +32,13 @@
 			</div>
 		</div>
   </div>
+  <div class="container">
+  	<div class="row">
+  		<hr />
+
+  	</div>
+  </div>
+	
 </body>
 
 <template name="conversation">
@@ -31,4 +47,19 @@
 			<li><strong>{{ senderUsername }}</strong> ({{ timestamp }}): {{ msg }}</li>
 		</ul>
 	{{/each}}
+</template>
+
+<template name="friendsList">
+	{{ #each friends }}
+		<div class="friend">
+			<ul>
+				<li><span class="glyphicon glyphicon-user {{ status }}"></span> {{ name }}</li>
+			</ul>
+		</div>
+	{{/each }}
+	<div>
+		<form id="add-friend">
+			<span class="glyphicon glyphicon-plus"></span><input type="text" name="text" id="add-friend-field" placeholder="Add friend by name">
+		</form>
+	</div>
 </template>

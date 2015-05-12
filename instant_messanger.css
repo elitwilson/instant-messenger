@@ -1,1 +1,18 @@
 /* CSS declarations go here */
+#friends-container {
+
+}
+
+.friend {
+}
+
+.friend ul li {
+	list-style-type: none;
+}
+
+.online {
+	color: green;
+}
+.offline {
+	color: grey;
+}
