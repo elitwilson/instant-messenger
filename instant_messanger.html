@@ -3,6 +3,7 @@
 </head>
 
 <body>
+{{ selectedFriend.username }}
   <div class="container">	
   	<h1 class="text-center">Instant Messenger</h1><div class="pull-right">{{> loginButtons }}</div>
   	<div class="row">
@@ -53,7 +54,7 @@
 	{{ #each friends }}
 		<div class="friend">
 			<ul>
-				<li><span class="glyphicon glyphicon-user {{ status }}"></span> {{ name }}</li>
+				<li><span class="glyphicon glyphicon-user {{ status }}"></span> <a href="#" class="friendLink">{{ name }}</a> <span class="btn glyphicon glyphicon-minus remove"></span></li>
 			</ul>
 		</div>
 	{{/each }}

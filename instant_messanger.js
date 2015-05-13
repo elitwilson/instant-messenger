@@ -1,28 +1,27 @@
 Msgs = new Mongo.Collection("msgs");
+//Conversations = new Mongo.Collection("conversations");
+
       
 if (Meteor.isClient) {
+  var selectedFriend = null;
   //SUBSCRIPTIONS
   // --------------------------------------------------------------
   Meteor.subscribe('msgs');
   Deps.autorun(function() {
     Meteor.subscribe('currentUserFriends');
   });
-  //END SUBSCRIPTIONS
 
-  Template.conversation.helpers({
-    msgs: function() {
-      return Msgs.find({});
-    }
+  Deps.autorun(function() {
+    Meteor.subscribe('allUsers');
   });
+  //END SUBSCRIPTIONS
 
   Template.body.events({
     "submit #msg-entry": function(event) {
       var msg = event.target.text.value;
-
       Meteor.call("addMsg", msg);
       //reset text field to blank
       event.target.text.value = "";
-
       // Prevent default form submit
       return false;
     },
@@ -33,23 +32,39 @@ if (Meteor.isClient) {
       Meteor.call("addFriend", event.target.text.value);
       event.target.text.value = "";
       return false;
+    },
+    "click .remove": function () {
+      Meteor.call("removeFriend", this._id);
+    },
+    "click .friendLink": function() {
+      selectedFriend = Meteor.users.findOne({_id: this._id});
+      console.log(selectedFriend.username);
     }
   });
 
-  Template.body.helpers({
-    users: function() {
-      return null;
+  Template.conversation.helpers({
+    msgs: function() {
+      return Msgs.find({});
     }
   });
 
   Template.friendsList.helpers({
     friends: function() {
       if (Meteor.user() != null || Meteor.user() != undefined) {
-        return Meteor.user().friends;  
+        return _.sortBy(Meteor.user().friends, 'name');  
       }
       else {
         return null;
       }
+    }
+  });
+
+  Template.body.helpers({
+    selectedFriend: function() {
+      console.log('body helper');
+      //console.log(SelectedFriend);
+      //console.log(Meteor.users.findOne({_id: SelectedFriend}));      
+      return selectedFriend;
     }
   });
 
@@ -74,7 +89,11 @@ if (Meteor.isServer) {
 
   Meteor.publish('msgs', function() {
     return Msgs.find({});
-  })
+  });
+
+  Meteor.publish('allUsers', function() {
+    return Meteor.users.find({});
+  });
 }
 
 // METHODS 
@@ -122,28 +141,17 @@ Meteor.methods({
       else {
       }
     }
-
-    /*try { 
-      var user = Meteor.users.findOne({ username: name });
-    }
-    catch (e) {
-      if (Meteor.users.findOne({ username: name }) == undefined) {
-        console.log("Person does not exist.");
-      }
-      else {
-        console.log(e);
-      }
-    }*/
-
-    
-
-    
-
     //"Here, we have this $set operator that we can use to modify the value of a field 
     //(or multiple fields) without deleting the document. So after the colon, we just 
     //pass through the fields we want to modify and their new values:"
     //Meteor.users.update({ _id: currentUser._id }, { $set:{"profile":{}}}); 
 
     //provide feedback for success/failure.
+  },
+  removeFriend: function(id) {
+    var currentUser = Meteor.user();
+    var friends = Meteor.user().friends;
+    friends = _.without(friends, _.findWhere(friends, { _id: id}));
+    Meteor.users.update({ _id: currentUser._id }, { $set:{"friends":friends}});
   }
 });
