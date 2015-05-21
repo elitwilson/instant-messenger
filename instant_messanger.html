@@ -3,9 +3,13 @@
 </head>
 
 <body>
-{{ selectedFriend.username }}
   <div class="container">	
-  	<h1 class="text-center">Instant Messenger</h1><div class="pull-right">{{> loginButtons }}</div>
+  	<div class="text-center">
+  		<h1>Instant Messenger</h1><div class="pull-right">{{> loginButtons }}</div>
+  		{{# if selectedFriend.username }}
+  			<p>Messaging: {{ selectedFriend.username }}</p>
+  		{{/if}}
+	</div>
   	<div class="row">
   		<div class="col-md-4"></div>
 			<div class="col-md-4">
