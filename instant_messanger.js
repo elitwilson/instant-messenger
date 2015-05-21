@@ -1,6 +1,19 @@
 Msgs = new Mongo.Collection("msgs");
 //Conversations = new Mongo.Collection("conversations");
-
+/*
+var converstion = {
+  messages: [],
+  members: [],
+  id: 123
+}
+*/
+/* WHY THE FUCK........ FIX THIS SHIT
+ - Can message yourself
+ - 
+ - 
+ - 
+ - 
+*/
       
 if (Meteor.isClient) {
   var selectedFriend = null;
@@ -39,12 +52,16 @@ if (Meteor.isClient) {
     "click .friendLink": function() {
       selectedFriend = Meteor.users.findOne({_id: this._id});
       console.log(selectedFriend.username);
+      Session.set("selectedFriend", selectedFriend);
     }
   });
 
   Template.conversation.helpers({
     msgs: function() {
       return Msgs.find({});
+    },
+    conversation: function() {
+
     }
   });
 
@@ -64,7 +81,7 @@ if (Meteor.isClient) {
       console.log('body helper');
       //console.log(SelectedFriend);
       //console.log(Meteor.users.findOne({_id: SelectedFriend}));      
-      return selectedFriend;
+      return Session.get("selectedFriend");
     }
   });
 
@@ -113,6 +130,9 @@ Meteor.methods({
       timestamp: moment(date).format('l LT'), //Using moment.js package to format dates.
       createdAt: new Date()
     });
+  },
+  thisConversation: function() {
+    
   },
   addFriend: function(name) {
     //check to see if username exists in collection of users
