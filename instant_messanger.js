@@ -1,5 +1,5 @@
 Msgs = new Mongo.Collection("msgs");
-//Conversations = new Mongo.Collection("conversations");
+Conversations = new Mongo.Collection("conversations");
 
       
 if (Meteor.isClient) {
@@ -62,8 +62,6 @@ if (Meteor.isClient) {
   Template.body.helpers({
     selectedFriend: function() {
       console.log('body helper');
-      //console.log(SelectedFriend);
-      //console.log(Meteor.users.findOne({_id: SelectedFriend}));      
       return selectedFriend;
     }
   });
