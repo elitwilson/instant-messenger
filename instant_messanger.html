@@ -49,7 +49,7 @@
 <template name="conversation">
 	{{#each msgs}}
 		<ul>
-			<li><strong>{{ senderUsername }}</strong> ({{ timestamp }}): {{ msg }}</li>
+			<li><strong>{{ sender.username }}</strong> ({{ timestamp }}): {{ msgText }}</li>
 		</ul>
 	{{/each}}
 </template>

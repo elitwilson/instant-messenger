@@ -29,16 +29,19 @@ if (Meteor.isClient) {
     Meteor.subscribe('allUsers');
   });
 
-  /*Deps.autorun(function() {
+  Deps.autorun(function() {
     Meteor.subscribe('allConversations');
-  })*/
+  })
   //END SUBSCRIPTIONS
 
   Template.body.events({
     "submit #msg-entry": function(event) {
+      console.log("currentConversation object: ");
+      console.log(Session.get("currentConversation"));
       var msgText = event.target.text.value;
       var date = new Date();
       var convo = Session.get("currentConversation");
+      //Format nicely packaged message object for use in the conversation
       var message = {
         msgText: msgText,
         sender: Meteor.user(),
@@ -46,20 +49,26 @@ if (Meteor.isClient) {
         createdAt: new Date()
       }
       convo.messages.push(message);
+      // If currentConversation has an id, then update it in the DB
+      if (convo._id) {
+        Meteor.call("updateConversation", convo);
+        Session.set("currentConversation", convo);
+        console.log(Session.get("currentConversation"));
+      }
+      // else create new conversation in DB
+      else {
+        Meteor.call("newConversation", convo, function(err, data) {
+          if (err) {
+            console.log(err);
+          }
+          Session.set("currentConversation", Conversations.findOne(data));
+          console.log(Session.get("currentConversation"));
+        });
+      }
 
-
-      /*var message = {
-        msgText: msg,
-        senderId: Meteor.userId(),
-        senderUsername: Meteor.user().username,
-        timestamp: moment(date).format('l LT'), //Using moment.js package to format dates.
-        createdAt: new Date()
-      }*/
-
-
-      console.log(convo);
-      Meteor.call("updateConversation", convo);
-      Session.setPersistent("currentConversation", convo);
+      //Need to set session to newly updated or created conversation...(Somehow)
+      //Session.set("currentConversation", convo);
+      
       //reset text field to blank
       event.target.text.value = "";
       // Prevent default form submit
@@ -87,7 +96,8 @@ if (Meteor.isClient) {
 
   Template.conversation.helpers({
     msgs: function() {
-      return Msgs.find({});
+      var c = Session.get("currentConversation");
+      return c.messages;
     },
     conversation: function() {
 
@@ -108,7 +118,12 @@ if (Meteor.isClient) {
   Template.body.helpers({
     selectedFriend: function() {
       var convo = Session.get("currentConversation");
-      return convo.friend;
+      if (convo != undefined) {
+        return convo.friend;
+      }
+      else {
+        return null;
+      }
     }
   });
 
@@ -139,9 +154,9 @@ if (Meteor.isServer) {
     return Meteor.users.find({});
   });
 
-  /*Meteor.publish('allConversations', function() {
-    return Meteor.Conversations.find({});
-  });*/
+  Meteor.publish('allConversations', function() {
+    return Conversations.find({});
+  });
 }
 
 // METHODS 
@@ -164,11 +179,24 @@ Meteor.methods({
     });
   },
   updateConversation: function(convo) {
+    console.log("updating collection");
+    return Conversations.update({ _id: convo._id }, { $set: {"messages": convo.messages }}, function(err, _id) {
+      if (err != null) {
+        console.log('error: ' + err);
+        return err;
+      }
+    });
+
+    //Meteor.users.update({ _id: currentUser._id }, { $set:{"friends":[]}});
   },
   newConversation: function(convo) {
     console.log("starting new conversation") ;
-    //Conversations.insert({
-    //});
+    return Conversations.insert(convo, function(error, _id) {
+      if (error != null) {
+        console.log('error: ' + error);   
+        return error; 
+      }
+    }); 
   },
   findConversation: function(id) {
     console.log(id);
