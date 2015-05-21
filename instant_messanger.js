@@ -11,13 +11,13 @@ var converstion = {
 /* WHY THE FUCK........ FIX THIS SHIT
  - Can message yourself
  - 
- - 
- - 
- - 
 */
       
 if (Meteor.isClient) {
   var selectedFriend = null;
+  var currentConversation = {
+    messages: []
+  };
   //SUBSCRIPTIONS
   // --------------------------------------------------------------
   Meteor.subscribe('msgs');
@@ -28,12 +28,38 @@ if (Meteor.isClient) {
   Deps.autorun(function() {
     Meteor.subscribe('allUsers');
   });
+
+  /*Deps.autorun(function() {
+    Meteor.subscribe('allConversations');
+  })*/
   //END SUBSCRIPTIONS
 
   Template.body.events({
     "submit #msg-entry": function(event) {
-      var msg = event.target.text.value;
-      Meteor.call("addMsg", msg);
+      var msgText = event.target.text.value;
+      var date = new Date();
+      var convo = Session.get("currentConversation");
+      var message = {
+        msgText: msgText,
+        sender: Meteor.user(),
+        timestamp: moment(date).format('l LT'), //Using moment.js package to format dates.
+        createdAt: new Date()
+      }
+      convo.messages.push(message);
+
+
+      /*var message = {
+        msgText: msg,
+        senderId: Meteor.userId(),
+        senderUsername: Meteor.user().username,
+        timestamp: moment(date).format('l LT'), //Using moment.js package to format dates.
+        createdAt: new Date()
+      }*/
+
+
+      console.log(convo);
+      Meteor.call("updateConversation", convo);
+      Session.setPersistent("currentConversation", convo);
       //reset text field to blank
       event.target.text.value = "";
       // Prevent default form submit
@@ -52,8 +78,10 @@ if (Meteor.isClient) {
     },
     "click .friendLink": function() {
       selectedFriend = Meteor.users.findOne({_id: this._id});
-      console.log(selectedFriend.username);
       Session.set("selectedFriend", selectedFriend);
+      currentConversation.friend = selectedFriend;
+      console.log(currentConversation);
+      Session.setPersistent("currentConversation", currentConversation);
     }
   });
 
@@ -79,8 +107,8 @@ if (Meteor.isClient) {
 
   Template.body.helpers({
     selectedFriend: function() {
-      console.log('body helper');
-      return Session.get("selectedFriend");
+      var convo = Session.get("currentConversation");
+      return convo.friend;
     }
   });
 
@@ -110,6 +138,10 @@ if (Meteor.isServer) {
   Meteor.publish('allUsers', function() {
     return Meteor.users.find({});
   });
+
+  /*Meteor.publish('allConversations', function() {
+    return Meteor.Conversations.find({});
+  });*/
 }
 
 // METHODS 
@@ -120,6 +152,7 @@ Meteor.methods({
     Msgs.remove({});
   },
   addMsg: function(msg) {
+    // Code is deprecated and to be replaced with sendMsg
     var date = new Date();
 
     Msgs.insert({
@@ -130,8 +163,22 @@ Meteor.methods({
       createdAt: new Date()
     });
   },
-  thisConversation: function() {
-    
+  updateConversation: function(convo) {
+  },
+  newConversation: function(convo) {
+    console.log("starting new conversation") ;
+    //Conversations.insert({
+    //});
+  },
+  findConversation: function(id) {
+    console.log(id);
+    return "complete";
+  },
+  archiveConversation: function () {
+    //TODO
+  },
+  deleteConversation: function () {
+
   },
   addFriend: function(name) {
     //check to see if username exists in collection of users
@@ -168,6 +215,11 @@ Meteor.methods({
     //provide feedback for success/failure.
   },
   removeFriend: function(id) {
+    /*
+      TODO:
+        - If this friend is in the current conversation, make sure to remove them from current convo.
+        - 
+    */
     var currentUser = Meteor.user();
     var friends = Meteor.user().friends;
     friends = _.without(friends, _.findWhere(friends, { _id: id}));
