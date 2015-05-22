@@ -24,7 +24,6 @@ if (Meteor.isClient) {
       var msgText = event.target.text.value;
       var date = new Date();
       var friend = Session.get("selectedFriend");
-      // *****var convo = Session.get("currentConversation");
       //Format nicely packaged message object for use in the conversation
       var message = {
         msgText: msgText,
@@ -55,6 +54,10 @@ if (Meteor.isClient) {
     },
     "click .clearSelectedFriend": function() {
       Session.set("selectedFriend", null);
+    },
+    "click #login-buttons-logout": function() {
+      Session.set("selectedFriend", null);
+      return false;
     }
   });
 
@@ -62,7 +65,18 @@ if (Meteor.isClient) {
     conversation: function() {
       var friend = Session.get("selectedFriend");
       if (friend) {
-        return Conversations.findOne({ friend: friend });
+        if (Meteor.user() != undefined && Meteor.user() != null) {
+          var convo = Conversations.find({'members.username': {$all: [friend.username, Meteor.user().username]}}).fetch()[0]; 
+          return convo;
+        }
+        /*
+            Ok, this is so janky - 
+
+        var cursor = Conversations.find({}).fetch()[0];
+        var convo = Meteor.call("findCurrentConversation", friend, function(err, data) {
+          Session.set("currentConversation", data);
+        });
+        return Session.get("currentConversation");*/
       }
     }
   });
