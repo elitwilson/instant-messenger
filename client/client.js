@@ -38,10 +38,11 @@ if (Meteor.isClient) {
       // Prevent default form submit
       return false;
     },
-    "click #clear-history": function (event, template) {
-      Meteor.call("clearHistory");
+    "click #clear-history": function () {
+      var friend = Session.get("selectedFriend");
+      Meteor.call("clearHistory", friend);
     },
-    "submit #add-friend": function() {
+    "submit #add-friend": function(event) {
       Meteor.call("addFriend", event.target.text.value);
       event.target.text.value = "";
       return false;

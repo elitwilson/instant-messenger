@@ -34,12 +34,12 @@ if (Meteor.isServer) {
 // --------------------------------------------------------------------------
 
 Meteor.methods({
-  clearHistory: function() {
-    Msgs.remove({});
+  clearHistory: function(friend) {
+    var convo = Meteor.call("findCurrentConversation", friend);
+    Conversations.remove(convo);
   },
   findCurrentConversation: function(friend) {
-    var convo = Conversations.find({ $and: [{ members: { $eq: friend }}, { members: { $eq: Meteor.user() } }]}).fetch();
-    convo = convo[0];
+    var convo = Conversations.find({'members.username': {$all: [friend.username, Meteor.user().username]}}).fetch()[0]; 
     return convo;
   },
   submitMessage: function(msg, friend) {
