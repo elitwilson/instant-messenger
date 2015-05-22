@@ -25,10 +25,13 @@
 					<h3>Must sign in or create account</h3>
 				{{/if}}
 			</div>
-			<div class="col-md-3" id="friends-container">
-				<h3>Friends</h3>
-				{{>friendsList}}
-			</div>
+			{{# if currentUser }}
+				<div class="col-md-3" id="friends-container">
+					<h3>Friends</h3>				
+					{{>friendsList}}
+					
+				</div>
+			{{/if}}
 		</div>
 		<div class="row">
 			<div class="col-md-2"></div>
